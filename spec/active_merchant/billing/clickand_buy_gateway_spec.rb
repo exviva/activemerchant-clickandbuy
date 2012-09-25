@@ -1,0 +1,46 @@
+require 'spec_helper'
+
+describe ActiveMerchant::Billing::ClickandBuyGateway do
+  let(:auth) { YAML.load_file(File.expand_path('../../../support/clickand_buy.yml', __FILE__)) }
+  let(:gateway) { described_class.new(auth) }
+
+  describe '#initialize' do
+    [:project_id, :merchant_id, :secret_key].each do |key|
+      it "requires #{key} in auth" do
+        expect { described_class.new(auth.except(key)) }.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+  describe '#setup_purchase' do
+    let(:amount) { Money.new(1000, 'EUR') }
+    let(:order_id) { Time.now.to_i }
+    let(:options) { {success_url: 'http://example.com', failure_url: 'http://example.com', order_id: order_id, ip: '1.2.3.4', order_description: '', locale: 'en'} }
+    subject { gateway.setup_purchase(amount, options) }
+
+    [:success_url, :failure_url, :order_id, :ip, :order_description, :locale].each do |key|
+      context "without #{key} in options" do
+        subject { gateway.setup_purchase(amount, options.except(key)) }
+
+        it 'raises an argument error' do
+          expect { subject }.to raise_error(ArgumentError)
+        end
+      end
+    end
+
+    it 'returns a hash with transaction details', :remote do
+      subject.should be_a(Hash)
+
+      subject['transactionID'].should match(/\d+/)
+      subject['transactionStatus'].should eq('CREATED')
+      subject['transactionType'].should eq('PAY')
+      subject['externalID'].should eq(order_id.to_s)
+
+      URI.parse(subject['redirectURL']).tap do |redirect_url|
+        redirect_url.scheme.should eq('https')
+        redirect_url.host.should eq('checkout.clickandbuy-s1.com')
+        redirect_url.path.should eq('/frontend/secure/checkout')
+      end
+    end
+  end
+end
