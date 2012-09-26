@@ -3,6 +3,13 @@ require 'spec_helper'
 describe ActiveMerchant::Billing::ClickandBuyGateway do
   let(:auth) { YAML.load_file(File.expand_path('../../../support/clickand_buy.yml', __FILE__)) }
   let(:gateway) { described_class.new(auth) }
+  let(:amount) { Money.new(1000, 'EUR') }
+  let(:order_id) { Time.now.to_i }
+  let(:setup_purchase_options) { {success_url: 'http://example.com', failure_url: 'http://example.com', order_id: order_id, ip: '1.2.3.4', order_description: '', locale: 'en'} }
+
+  def perform_setup_purchase
+    gateway.setup_purchase(amount, setup_purchase_options)
+  end
 
   describe '#initialize' do
     [:project_id, :merchant_id, :secret_key].each do |key|
@@ -13,14 +20,11 @@ describe ActiveMerchant::Billing::ClickandBuyGateway do
   end
 
   describe '#setup_purchase' do
-    let(:amount) { Money.new(1000, 'EUR') }
-    let(:order_id) { Time.now.to_i }
-    let(:options) { {success_url: 'http://example.com', failure_url: 'http://example.com', order_id: order_id, ip: '1.2.3.4', order_description: '', locale: 'en'} }
-    subject { gateway.setup_purchase(amount, options) }
+    subject { perform_setup_purchase }
 
     [:success_url, :failure_url, :order_id, :ip, :order_description, :locale].each do |key|
       context "without #{key} in options" do
-        subject { gateway.setup_purchase(amount, options.except(key)) }
+        subject { gateway.setup_purchase(amount, setup_purchase_options.except(key)) }
 
         it 'raises an argument error' do
           expect { subject }.to raise_error(ArgumentError)
@@ -40,6 +44,27 @@ describe ActiveMerchant::Billing::ClickandBuyGateway do
         redirect_url.scheme.should eq('https')
         redirect_url.host.should eq('checkout.clickandbuy-s1.com')
         redirect_url.path.should eq('/frontend/secure/checkout')
+      end
+    end
+  end
+
+  describe '#check_status', :remote do
+    let(:transaction_id) { '123' }
+    subject { gateway.check_status(transaction_id) }
+
+    it 'returns the transaction ID' do
+      subject['transactionID'].should eq('123')
+    end
+
+    it 'returns an error if transaction not found' do
+      subject['errorDetails']['code'].should eq('3')
+    end
+
+    context 'with a valid transaction ID' do
+      let(:transaction_id) { perform_setup_purchase['transactionID'] }
+
+      it 'returns the transaction status' do
+        subject['transactionStatus'].should eq('CREATED')
       end
     end
   end

@@ -40,6 +40,12 @@ The `response` hash will contain amongst other keys two important ones: `transac
 The `transactionID` identifies the transaction at ClickandBuy, make sure you store it together with your order.
 The `redirectURL` is where you redirect the user so that they can confirm the purchase.
 
+After a user lands on `success_url`, you can check whether or not the transaction had been confirmed:
+
+    transaction = gateway.check_status(transaction_id)
+
+The `transaction` variable is a hash containing the response details, amongst others a `transactionStatus` key.
+
 ## Running specs
 
 Copy `spec/support/clickand_buy.yml.example` to `spec/support/clickand_buy.yml`. Now run:

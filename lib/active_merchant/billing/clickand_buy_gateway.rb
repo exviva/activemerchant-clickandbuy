@@ -1,4 +1,5 @@
 require 'active_merchant/clickand_buy/request/pay_request'
+require 'active_merchant/clickand_buy/request/status_request'
 
 module ActiveMerchant
 	module Billing
@@ -11,6 +12,10 @@ module ActiveMerchant
       def setup_purchase(amount, options)
         requires!(options, :success_url, :failure_url, :order_id, :ip, :order_description, :locale)
         perform(ClickandBuy::Request::PayRequest.new(@auth, amount, options))
+      end
+
+      def check_status(transaction_id)
+        perform(ClickandBuy::Request::StatusRequest.new(@auth, transaction_id))
       end
 
       private
