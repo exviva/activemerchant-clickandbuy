@@ -5,7 +5,7 @@ describe ActiveMerchant::Billing::ClickandBuyGateway do
   let(:gateway) { described_class.new(auth) }
   let(:amount) { Money.new(1000, 'EUR') }
   let(:order_id) { Time.now.to_i }
-  let(:setup_purchase_options) { {success_url: 'http://example.com', failure_url: 'http://example.com', order_id: order_id, ip: '1.2.3.4', order_description: '', locale: 'en'} }
+  let(:setup_purchase_options) { {success_url: 'http://example.com', failure_url: 'http://example.com', order_id: order_id, ip: '1.2.3.4', order_description: '', locale: 'en', success_expiration: 30} }
 
   def perform_setup_purchase
     gateway.setup_purchase(amount, setup_purchase_options)

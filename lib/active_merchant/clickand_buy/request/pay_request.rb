@@ -22,6 +22,7 @@ module ActiveMerchant::ClickandBuy::Request
       xml.externalID @options[:order_id]
       xml.consumerIPAddress @options[:ip]
       xml.consumerLanguage @options[:locale]
+      xml.successExpiration @options[:success_expiration] if @options.key?(:success_expiration)
     end
 
     def extract_response_details(response)

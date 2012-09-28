@@ -59,6 +59,18 @@ describe ActiveMerchant::ClickandBuy::Request::PayRequest do
     it 'uses the locale option for consumerLanguage' do
       details['consumerLanguage'].should eq(locale)
     end
+
+    it 'does not have successExpiration' do
+      details.should_not have_key('successExpiration')
+    end
+
+    describe 'with success_expiration provided' do
+      before { options[:success_expiration] = 1439 }
+
+      it 'uses the success_expiration option for successExpiration' do
+        details['successExpiration'].should eq('1439')
+      end
+    end
   end
 
   describe '#handle_response' do

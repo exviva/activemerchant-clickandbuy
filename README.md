@@ -32,7 +32,8 @@ Now you can initiate a transaction at ClickandBuy:
       order_id: 123,                                             # your unique order identifier
       ip: '1.2.3.4',                                             # user's IP address
       order_description: 'ACME Earthquake Pills',                # what the user is buying
-      locale: 'en'                                               # user's locale ('en' or 'de')
+      locale: 'en',                                              # user's locale ('en' or 'de')
+      success_expiration: 1439                                   # (optional) how many minutes to wait for success
     }
     response = gateway.setup_purchase(amount, options)
 
