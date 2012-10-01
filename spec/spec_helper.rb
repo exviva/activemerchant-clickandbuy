@@ -7,6 +7,8 @@ require 'activemerchant-clickandbuy'
 require 'money'
 require 'active_support/core_ext/hash/except'
 
+ActiveMerchant::Billing::Base.mode = :test
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
