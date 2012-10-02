@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ['lib']
 
-  gem.add_runtime_dependency 'activemerchant'
+  gem.add_runtime_dependency 'activemerchant', '>= 1.27.0'
 
   gem.add_development_dependency 'rspec'
 end
