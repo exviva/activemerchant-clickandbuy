@@ -2,7 +2,7 @@ require 'active_merchant/clickand_buy/request/pay_request'
 require 'active_merchant/clickand_buy/request/status_request'
 
 module ActiveMerchant
-	module Billing
+  module Billing
     class ClickandBuyGateway < Gateway
       self.test_url = 'https://api.clickandbuy-s1.com/webservices/soap/pay_1_1_0'
       self.live_url = 'https://api.clickandbuy.com/webservices/soap/pay_1_1_0'
